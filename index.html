@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search Engine</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+  <div class="container mx-auto mt-10">
+    <h2 class="text-center text-3xl font-bold mb-8">Fubar Search</h2>
+    <form id="searchQueryForm" class="bg-white p-8 rounded-lg shadow-md mb-8">
+      <div class="mb-4">
+        <label for="name" class="block text-gray-700 font-medium mb-2">Search it :)</label>
+        <input type="text" id="search-query"
+          class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" required>
+      </div>
+      <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600">Search</button>
+    </form>
+
+    <h3 class="text-center text-2xl font-semibold mb-6">History</h3>
+    <div class="overflow-x-auto">
+      <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+        <thead>
+          <tr class="bg-gray-200">
+            <th class="py-3 px-6 text-left text-gray-600">Search Index</th>
+            <th class="py-3 px-6 text-left text-gray-600">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="searchTable">
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
+      const searchQueryForm = document.getElementById('searchQueryForm');
+      const searchTable = document.getElementById('searchTable');
+      let editIndex = null;
+
+      function displayAttendance() {
+        searchTable.innerHTML = '';
+        searchHistory.forEach((record, index) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td class="px-6">${record}</td>
+            <td>
+              <button class="bg-red-500 text-white px-2 py-1 rounded-lg hover:bg-red-600" onclick="deleteRecord(${index})">Delete</button>
+            </td>
+          `;
+          searchTable.appendChild(row);
+        });
+      }
+
+      searchQueryForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const historySearchQuery = document.getElementById('search-query').value;
+
+        const newRecord = historySearchQuery;
+
+        if (editIndex !== null) {
+          searchHistory[editIndex] = newRecord;
+          editIndex = null;
+        } else {
+          searchHistory.push(newRecord);
+        }
+        
+        localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+        searchQueryForm.reset();
+        displayAttendance();
+      });
+
+      window.deleteRecord = (index) => {
+        searchHistory.splice(index, 1);
+        localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+        displayAttendance();
+      };
+
+      displayAttendance();
+    });
+  </script>
+</body>
+
+</html>
